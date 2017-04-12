@@ -5,6 +5,7 @@
     <ImageView
         android:id="@+id/img"
         android:adjustViewBounds="true"
+        android:scaleType="fitXY"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <TextView
@@ -12,6 +13,7 @@
         android:layout_gravity="center"
         android:textColor="#000"
         android:textStyle="bold"
+        android:layout_margin="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </LinearLayout>

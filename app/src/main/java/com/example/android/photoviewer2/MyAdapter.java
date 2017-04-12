@@ -20,9 +20,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     private PicItemClickListener mOnClickListener;
     public List<createList> picList;
     Context context;
+    ImageView im;
 
     public interface PicItemClickListener{
-        public void onPicItemClick(int clickItemIndex);
+        public void onPicItemClick(int clickItemIndex,ImageView image);
+        public void onPicItemLongClick(int clickItemIndex);
     }
 
     public MyAdapter(Context context, List<createList> picList, PicItemClickListener clicker){
@@ -53,7 +55,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         return picList.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         ImageView img;
         TextView title;
 
@@ -63,12 +65,22 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             img = (ImageView) view.findViewById(R.id.img);
             title = (TextView) view.findViewById(R.id.title);
             view.setOnClickListener(this);
+            view.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             int clickedPosition = getAdapterPosition();
-            mOnClickListener.onPicItemClick(clickedPosition);
+            im = (ImageView) view.findViewById(R.id.img);
+            mOnClickListener.onPicItemClick(clickedPosition,im);
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            int clickedPosition = getAdapterPosition();
+
+            mOnClickListener.onPicItemLongClick(clickedPosition);
+            return true;
         }
     }
 

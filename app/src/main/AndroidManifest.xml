@@ -16,6 +16,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ChildActivity" />
+        <activity android:name=".ShowFullScreen"
+            ></activity>
     </application>
 
 </manifest>
