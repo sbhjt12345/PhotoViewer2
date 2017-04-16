@@ -2,6 +2,7 @@ package com.example.android.photoviewer2;
 
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Jiantao on 4/12/17.
  */
@@ -17,6 +21,9 @@ import android.widget.TextView;
 public class CustomSwipeAdapter extends PagerAdapter {
 
     private int pos;
+    private boolean isFav;
+    private int[] favcount;
+    List<int[]> newimages;
     private int[] images = {R.drawable.image01,R.drawable.image02,R.drawable.image03,R.drawable.image04,
                             R.drawable.image05,R.drawable.image06};
     private int[] images2 = {R.drawable.image02,R.drawable.image03,R.drawable.image04,
@@ -32,9 +39,13 @@ public class CustomSwipeAdapter extends PagerAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
 
-    public CustomSwipeAdapter(Context context, int pos){
+    public CustomSwipeAdapter(Context context, int pos,int[] favcount,boolean isFav){
         this.context = context;
         this.pos = pos;
+        this.favcount = favcount;
+        this.isFav = isFav;
+        newimages = generateList(buildImageList(images,isFav,favcount));
+
     }
 
     @Override
@@ -52,8 +63,11 @@ public class CustomSwipeAdapter extends PagerAdapter {
         return pos;
     }
 
+
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
+
+
 
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View item_view = layoutInflater.inflate(R.layout.swipe_layout,container,false);
@@ -85,11 +99,7 @@ public class CustomSwipeAdapter extends PagerAdapter {
                 imageView.setImageResource(images6[position]);
                 break;
             }
-
-
         }
-
-       // imageView.setImageResource(images[pos]);
         container.addView(item_view);
         return item_view;
     }
@@ -98,5 +108,50 @@ public class CustomSwipeAdapter extends PagerAdapter {
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((LinearLayout) object);
 
+    }
+
+    public int[] buildImageList(int[] images,boolean isFav, int[] favcount){
+        int sum = 0;
+        if (isFav){          // get only favorite photos
+            for (int i=0;i<favcount.length;i++){
+                if (favcount[i]%2==1) sum++;
+            }
+        }
+        else return images;
+        int[] newimage = new int[sum];
+        int count = 0;
+        if (isFav){
+            for (int i=0;i<favcount.length;i++){
+                if (favcount[i]%2==1) {
+                    newimage[count] = images[i];
+                    count++;
+                }
+            }
+            return newimage;
+        }
+        else return images;
+    }
+
+    public int[] swap(int[] images, int pos){
+        int[] res = new int[images.length];
+        int count = 0;
+        for (int i=pos-1;i<images.length;i++){
+            res[count] = images[i];
+            count++;
+        }
+        for (int i=0;i<pos-1;i++){
+            res[count] = images[i];
+            count++;
+        }
+        return res;
+    }
+
+    public List<int[]> generateList(int[] images){
+        List<int[]> list = new ArrayList<>();
+        int n = images.length;
+        for (int i=1;i<=n;i++){
+            list.add(swap(images,i));
+        }
+        return list;
     }
 }

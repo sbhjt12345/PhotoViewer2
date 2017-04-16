@@ -1,14 +1,21 @@
 package com.example.android.photoviewer2;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,7 +24,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MyAdapter.PicItemClickListener {
+import static android.R.string.yes;
+
+public class MainActivity extends AppCompatActivity implements MyAdapter.PicItemClickListener,SharedPreferences.OnSharedPreferenceChangeListener {
 
     private final String[] imageTitles = {
             "In Kyoto",
@@ -37,13 +46,14 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.PicItem
             R.drawable.image06,
     };
 
-    public boolean[] isFavorite = new boolean[10];
+    public boolean[] fav = {true,true,true,true,true,true};
+    public int[] favcount = new int[6];
+
 
     private MyAdapter myAdapter;
     private RecyclerView pictures;
     private Toast mToast;
-    boolean isImageFitToScreen;
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "Yo know whos talking to Papa";
 
 
 
@@ -57,54 +67,61 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.PicItem
         GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),2);
         pictures.setLayoutManager(layoutManager);
         pictures.setHasFixedSize(true);
+        setupSharedPreferences();
         List<createList> acturalPics = makeList(imageTitles,imageID);
-        myAdapter = new MyAdapter(getApplicationContext(),acturalPics,this);
+        myAdapter = new MyAdapter(getApplicationContext(),acturalPics,this,favcount,false);
         pictures.setAdapter(myAdapter);
     }
+
+    private void setupSharedPreferences() {
+        // Get all of the values from shared preferences to set it up
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        // Register the listener
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+
 
     public List<createList> makeList(String[] imageTitles, Integer[] imageID){
         List<createList> list = new ArrayList<>();
         for (int i=0;i<imageID.length;i++){
-            createList newpic = new createList(imageTitles[i],imageID[i]);
-            list.add(newpic);
+            Log.i("picture " + i,"value is: " + fav[i]);
+            //if (fav[i]==true) {
+                createList newpic = new createList(imageTitles[i], imageID[i]);
+                list.add(newpic);
+            //}
+        }
+        return list;
+    }
+
+    public List<createList> makeFavList(String[] imageTitles,Integer[] imageID, int[] favcount){
+        List<createList> list = new ArrayList<>();
+        for (int i=0;i<imageID.length;i++){
+            if (favcount[i]%2 != 0){
+                createList newpic = new createList(imageTitles[i], imageID[i]);
+                list.add(newpic);
+            }
         }
         return list;
     }
 
     @Override
     public void onPicItemClick(int clickItemIndex, ImageView image) {
-        //        if (mToast != null){
-//            mToast.cancel();
-//        }
-//        String toastMessage = "Photo " + imageTitles[clickItemIndex] + " is added to Favorite "
-//                + image;
-//
-//        String toastMessage2 = "Photo " + imageTitles[clickItemIndex] + " Removed from Favorite"
-//                + image;
-//
-//        if (isFavorite[clickItemIndex]){
-//            mToast = Toast.makeText(this,toastMessage2,Toast.LENGTH_LONG);
-//            TextView v = (TextView) mToast.getView().findViewById(android.R.id.message);
-//            v.setTextColor(Color.BLUE);
-//            isFavorite[clickItemIndex] = false;
-//        }
-//        else{
-//            mToast = Toast.makeText(this,toastMessage,Toast.LENGTH_LONG);
-//            TextView v = (TextView) mToast.getView().findViewById(android.R.id.message);
-//            v.setTextColor(Color.YELLOW);
-//            isFavorite[clickItemIndex] = true;
-//        }
-//
-//        mToast.show();
+        Log.i("im clicking","the short button");
         Intent fullIntent = new Intent(MainActivity.this,ShowFullScreen.class);
         fullIntent.putExtra("lbj",clickItemIndex);
+        fullIntent.putExtra("favlist",favcount);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isFav = sharedPreferences.getBoolean("show_favorite",false);
+        //Log.i("we need another test",""+ isFav);
+        fullIntent.putExtra("isfav",isFav);
         startActivity(fullIntent);
 
     }
 
     @Override
     public void onPicItemLongClick(int clickItemIndex) {
-
+        //Log.i("im clicking",title.getText().toString());
 
         if (mToast != null){
             mToast.cancel();
@@ -116,21 +133,24 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.PicItem
         Intent intent = new Intent(MainActivity.this,ChildActivity.class);
         intent.putExtra(Intent.EXTRA_TEXT,clickItemIndex);
         startActivity(intent);
+    }
 
-
-
-
+    @Override
+    public void onButtonItemClick(int clickItemIndex, Button bt) {
+        Log.i("i clikcked","a button" + clickItemIndex);
+        String nows = bt.getText().toString();
+        if (nows=="❤"){
+            bt.setText("○");
+        }
+        else {
+            bt.setText("❤");
+        }
+        favcount[clickItemIndex]++;
     }
 
     public void fullScreen() {
-
-        // BEGIN_INCLUDE (get_current_ui_flags)
-        // The UI options currently enabled are represented by a bitfield.
-        // getSystemUiVisibility() gives us that bitfield.
         int uiOptions = getWindow().getDecorView().getSystemUiVisibility();
         int newUiOptions = uiOptions;
-        // END_INCLUDE (get_current_ui_flags)
-        // BEGIN_INCLUDE (toggle_ui_flags)
         boolean isImmersiveModeEnabled =
                 ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) == uiOptions);
         if (isImmersiveModeEnabled) {
@@ -148,15 +168,6 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.PicItem
         if (Build.VERSION.SDK_INT >= 16) {
             newUiOptions ^= View.SYSTEM_UI_FLAG_FULLSCREEN;
         }
-
-        // Immersive mode: Backward compatible to KitKat.
-        // Note that this flag doesn't do anything by itself, it only augments the behavior
-        // of HIDE_NAVIGATION and FLAG_FULLSCREEN.  For the purposes of this sample
-        // all three flags are being toggled together.
-        // Note that there are two immersive mode UI flags, one of which is referred to as "sticky".
-        // Sticky immersive mode differs in that it makes the navigation and status bars
-        // semi-transparent, and the UI flag does not get cleared when the user interacts with
-        // the screen.
         if (Build.VERSION.SDK_INT >= 18) {
             newUiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         }
@@ -165,5 +176,48 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.PicItem
         //END_INCLUDE (set_ui_flags)
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.favorite_menu,menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings){
+            Intent startSettingsActivity = new Intent(this,SettingsActivity.class);
+            startActivity(startSettingsActivity);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+          if (key.equals("show_favorite")){
+              boolean isFav = sharedPreferences.getBoolean("show_favorite",false);
+              for (int i=0;i<favcount.length;i++){
+                  Log.i("hello, we have reached " + i, " and this is " + favcount[i]);
+              }
+              if (isFav==false){
+                  List<createList> acturalPics = makeList(imageTitles,imageID);
+                  myAdapter = new MyAdapter(getApplicationContext(),acturalPics,this,favcount,isFav);
+                  pictures.setAdapter(myAdapter);
+              }
+              else{
+                  List<createList> acturalPics = makeFavList(imageTitles,imageID,favcount);
+                  myAdapter = new MyAdapter(getApplicationContext(),acturalPics,this,favcount,isFav);
+                  pictures.setAdapter(myAdapter);
+              }
+          }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+    }
 }

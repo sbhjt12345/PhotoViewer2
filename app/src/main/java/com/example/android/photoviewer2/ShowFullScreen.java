@@ -14,6 +14,8 @@ public class ShowFullScreen extends AppCompatActivity {
     ViewPager viewPager;
     CustomSwipeAdapter csa;
     int picIndex = 1;
+    int[] favcount;
+    Boolean isFav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,17 +30,14 @@ public class ShowFullScreen extends AppCompatActivity {
         Intent acceptIntent = getIntent();
         if (acceptIntent.hasExtra("lbj")){
             picIndex = acceptIntent.getIntExtra("lbj",-1)+1;
-//            String tmp = "";
-//            if (picIndex<10){
-//               tmp = "@drawable/image0" + picIndex;
-//            }
-//            else tmp = "@drawable/image" + picIndex;
-//
-//            int imageResource = getResources().getIdentifier(tmp, null, getPackageName());
-//            Drawable res = getResources().getDrawable(imageResource);
-//            mImage.setImageDrawable(res);
         }
-        csa = new CustomSwipeAdapter(this,picIndex);
+        if (acceptIntent.hasExtra("favlist")){
+            favcount = acceptIntent.getIntArrayExtra("favlist");
+        }
+        if (acceptIntent.hasExtra("isfav")){
+            isFav = acceptIntent.getBooleanExtra("isfav",false);
+        }
+        csa = new CustomSwipeAdapter(this,picIndex,favcount,isFav);
         viewPager.setAdapter(csa);
 
     }
