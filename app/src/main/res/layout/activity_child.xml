@@ -4,11 +4,78 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.android.photoviewer2.ChildActivity">
+    tools:context="com.example.android.photoviewer2.ChildActivity"
+    android:background="@drawable/wallpaper">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_display"/>
+        android:id="@+id/tv_display"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:layout_margin="20dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_place"
+        android:textStyle="bold"
+        android:textSize="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="100dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_showmap"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="160dp"
+        android:text="Show on Google Map"
+        android:clickable="true"
+        android:onClick="openMap"/>
+
+        <TextView
+            android:id="@+id/clickable_text_view"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="260dp"
+            android:layout_marginLeft="20dp"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:visibility="visible"/>
+
+        <EditText
+            android:id="@+id/hidden_edit_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="260dp"
+            android:layout_marginLeft="20dp"
+            android:visibility="invisible"
+            android:hint="Add new descriptions here"
+             />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/toggle"
+        android:onClick="switchText"
+        android:text="Edit"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="320dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/share"
+        android:text="Share"
+        android:layout_marginTop="500dp"
+        android:textSize="40dp"
+        android:layout_centerHorizontal="true"
+        android:background="#E6E6FA"
+        android:onClick="shareOn"
+        />
+
+
 
 </RelativeLayout>

@@ -122,14 +122,6 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.PicItem
     @Override
     public void onPicItemLongClick(int clickItemIndex) {
         //Log.i("im clicking",title.getText().toString());
-
-        if (mToast != null){
-            mToast.cancel();
-        }
-        String toastmessage = "#" + clickItemIndex + " is shown";
-        mToast = Toast.makeText(this,toastmessage,Toast.LENGTH_LONG);
-        mToast.show();
-
         Intent intent = new Intent(MainActivity.this,ChildActivity.class);
         intent.putExtra(Intent.EXTRA_TEXT,clickItemIndex);
         startActivity(intent);
